@@ -63,13 +63,10 @@ export async function registerForEvent(
 				return;
 			}
 
-			const currentRegistrations = await Registration.findAll({
+			const registrationsNow = await Registration.count({
 				where: { eventId },
-				attributes: ["id"],
 				transaction: t,
 			});
-
-			const registrationsNow = currentRegistrations.length;
 
 			if (registrationsNow >= event.capacity) {
 				res.status(409).json({
