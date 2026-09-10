@@ -20,7 +20,10 @@ export async function registerForEvent(
 			const eventId = req.params.eventId as string;
 			const { userId } = req.body as { userId?: string };
 
-			const event = await Event.findByPk(eventId, { transaction: t });
+			const event = await Event.findByPk(eventId, {
+				transaction: t,
+				lock: t.LOCK.UPDATE,
+			});
 			if (!event) {
 				res.status(404).json({
 					error: {
@@ -31,7 +34,7 @@ export async function registerForEvent(
 				return;
 			}
 
-			const user = await User.findByPk(userId);
+			const user = await User.findByPk(userId, { transaction: t });
 			if (!user) {
 				res.status(404).json({
 					error: {
@@ -64,7 +67,6 @@ export async function registerForEvent(
 				where: { eventId },
 				attributes: ["id"],
 				transaction: t,
-				lock: t.LOCK.UPDATE,
 			});
 
 			const registrationsNow = currentRegistrations.length;
